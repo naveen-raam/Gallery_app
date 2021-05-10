@@ -1,122 +1,123 @@
 import React, {Component} from 'react';
-import {GiftedChat, Bubble} from 'react-native-gifted-chat';
-import Fire from '../config/Fire';
-import {View, StyleSheet, Text} from 'react-native';
-import {Bubbles} from 'react-native-loader';
+
+import {StyleSheet, View, TouchableOpacity, TextInput, AsyncStorage,FlatList, ScrollView,RefreshControl,Image} from 'react-native';
+import { Text, Icon } from 'native-base';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp
+} from 'react-native-responsive-screen';
+
 import {Actions} from 'react-native-router-flux';
 
-class Chat extends Component {
+
+export default class Chat extends Component {
   constructor() {
     super();
     this.state = {
-      isLoading: false,
-      message: [],
-      user: {},
-      url: '',
+      loading: true,
+
+        data: "",
+
+      
     };
   }
 
-  get user() {
-    return {
-      name: Fire.shared.name,
-      _id: Fire.shared.uid,
-      avatar: this.state.url !== undefined ? this.state.url : null,
-      receiverId: this.props.data[0],
-    };
-  }
+  componentDidMount = () => {
+    this.setState({loading: false});
+    console.log("all props" , this.props.data)
+    let r = []
 
-  renderBubble = props => {
-    return (
-      <Bubble
-        {...props}
-        textStyle={{
-          right: {
-            color: '#BC2C3D',
-          },
-          left: {
-            color: '#EFD2BC',
-          },
-        }}
-        wrapperStyle={{
-          left: {
-            backgroundColor: '#c41e3a',
-          },
-          right: {
-            backgroundColor: '#F8B878',
-          },
-        }}
-      />
-    );
+    AsyncStorage.getAllKeys((err,keys) => {
+      // console.log(keys)
+      AsyncStorage.multiGet(keys, (err,stores) => {
+        stores.map((result,i,store) => {
+          let key = store[i][0];
+          let value = store[i][1];
+          // console.log(key)
+          var obj = JSON.parse(value)
+          if(obj.item){
+            for(var x in obj.item){
+              if(obj.key == this.props.data[1]){
+              console.log(obj.item[x].path)
+              let temp = {
+                id:x,
+                uri: obj.item[x].path,
+              }
+              r.push(temp)
+            }
+            }
+            //console.log(obj.item[0].path)
+          }
+          
+        })
+        console.log("hhh",r)
+        this.setState({data:r})
+      })
+      
+    })
+    
   };
 
-  onPressAvatar = () => {
-    Actions.friend({
-      title: this.props.data[1],
-      email: this.props.data[2],
-      address: this.props.data[3],
-      image: this.props.data[4],
-    });
-  };
+
+
+  keyExtractor = (item, index) => index.toString();
+
+  renderItem = ({item}) => (
+    
+
+    <TouchableOpacity  
+          
+    style={{flex:1/3, 
+    aspectRatio:1}}>
+      
+   <Image style={{marginTop: hp("5%"), flex: 1}} resizeMode='contain' source={{ uri:  item.uri}}></Image>
+</TouchableOpacity>
+  );
 
   render() {
-    return this.state.isLoading ? (
-      <View style={styles.loader}>
-        <Text style={styles.loadingText}>Please Wait...</Text>
-        <Bubbles size={15} color="#BC2C3D" />
-      </View>
-    ) : (
-      <GiftedChat
-        messages={this.state.messages}
-        onSend={Fire.shared.send}
-        user={this.user}
-        renderBubble={this.renderBubble}
-        onPressAvatar={this.onPressAvatar}
-      />
+    return (
+      <ScrollView>
+        <Text style={styles.TextInputName}>{this.props.data[4]}</Text>
+        <Text style={styles.descriptionText}>{this.props.data[0]}</Text>
+     
+        <FlatList
+       
+          keyExtractor={this.keyExtractor}
+          data={this.state.data}
+          renderItem={this.renderItem}
+        />
+      </ScrollView>
+     
     );
   }
 
-  componentDidMount() {
-    this.getImg();
-    this.msg();
-  }
-
-  msg() {
-    Fire.shared.on(
-      message =>
-        this.setState(previous => ({
-          messages: GiftedChat.append(previous.messages, message),
-          isLoading: false,
-        })),
-      this.props.data[0],
-    );
-  }
-
-  getImg() {
-    Fire.shared
-      .getImage(Fire.shared.uid)
-      .then(url => {
-        this.setState({url});
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  }
-
-  componentWillUnmount() {
-    Fire.shared.off();
-  }
 }
 
-export default Chat;
-
 const styles = StyleSheet.create({
-  loader: {
-    justifyContent: 'center',
+ 
+  background: {
+    paddingHorizontal: wp('4.17%'),
+    width: wp('88.89%'),
+    height: hp('6.11%'),
+    borderColor: '#BFBEBE',
+    borderWidth: 1,
+    borderRadius: 5,
+    marginHorizontal: 15,
+    flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
+
+    alignSelf: 'center',
   },
-  loadingText: {
-    fontSize: 22,
-    fontWeight: 'bold',
-  },
+  TextInputName: {
+    marginLeft: wp('5.56%'),
+    fontFamily: 'Montserrat_SemiBold',
+    fontSize: hp('3%'),
+    marginBottom: hp('1.81%'),
+},
+  descriptionText: {
+  marginLeft: wp('5.56%'),
+  fontFamily: 'Montserrat_SemiBold',
+  fontSize: hp('2%'),
+  marginBottom: hp('1.81%'),
+},
 });

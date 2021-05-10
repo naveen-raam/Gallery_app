@@ -6,7 +6,13 @@ import {
   View,
   StyleSheet,
   RefreshControl,
+  AsyncStorage,
+  Image,
 } from 'react-native';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp
+} from 'react-native-responsive-screen';
 import {ListItem} from 'react-native-elements';
 import {Actions} from 'react-native-router-flux';
 import firebase from '../config/Fire';
@@ -20,11 +26,42 @@ export default class ListChat extends Component {
       users: [],
       isLoading: true,
       refresh: false,
+
+      data : [],
     };
   }
 
   componentDidMount() {
+    let r = []
     firebase.shared.getAlluser(this.listUser);
+    AsyncStorage.getAllKeys((err,keys) => {
+      console.log(keys)
+      AsyncStorage.multiGet(keys, (err,stores) => {
+        stores.map((result,i,store) => {
+          let key = store[i][0];
+          let value = store[i][1];
+          console.log(key)
+          var obj = JSON.parse(value)
+          if(obj.item){
+            let temp = {
+              id: key,
+              title: obj.title,
+              desc: obj.desc,
+              path: obj.item[0].path
+            }
+            // console.log(obj.item[0].path)
+            //console.log(temp)
+            r.push(temp)
+            
+            // console.log(obj.title)
+          }
+          
+        })
+        console.log(r,"ff")
+        this.setState({data:r})
+      })
+    })
+    
   }
 
   listUser = users => {
@@ -34,32 +71,55 @@ export default class ListChat extends Component {
   keyExtractor = (item, index) => index.toString();
 
   renderItem = ({item}) => (
-    <TouchableOpacity
-      onPress={() =>
+
+    <TouchableOpacity  
+          onPress={() =>
         Actions.chat({
-          title: item.temp.name,
-          receiverId: item.keys,
-          image: item.temp.avatar,
-          email: item.temp.email,
-          address: item.temp.address,
+          title: item.id,
+          receiverId: item.desc,
+          image: item.title,
+          email: item.desc,
+          address: item.desc,
         })
-      }>
-      <ListItem
-        title={item.temp.name}
-        subtitle={item.temp.email}
-        leftAvatar={{
-          source: item.temp.avatar && {uri: item.temp.avatar},
-          title: item.temp.name[0],
-        }}
-        bottomDivider
-        chevron
-      />
-    </TouchableOpacity>
+      }
+    style={{flex:1/3, 
+    aspectRatio:1}}>
+      <Text style={styles.TextInputName}>{item.title}</Text>
+      <Text style={styles.descriptionText}>{item.desc}</Text>
+   <Image style={{flex: 1}} resizeMode='contain' source={{ uri:  item.path}}></Image>
+</TouchableOpacity>
   );
 
   onRefresh = () => {
     this.setState({refresh: true});
-    firebase.shared.getAlluser(this.listUser);
+    let r = []
+    AsyncStorage.getAllKeys((err,keys) => {
+      console.log(keys)
+      AsyncStorage.multiGet(keys, (err,stores) => {
+        stores.map((result,i,store) => {
+          let key = store[i][0];
+          let value = store[i][1];
+          console.log(key)
+          var obj = JSON.parse(value)
+          if(obj.item){
+            let temp = {
+              id: key,
+              title: obj.title,
+              desc: obj.desc,
+              path: obj.item[0].path
+            }
+            // console.log(obj.item[0].path)
+            //console.log(temp)
+            r.push(temp)
+            
+            // console.log(obj.title)
+          }
+          
+        })
+        console.log(r,"ff")
+        this.setState({data:r})
+      })
+    })
     this.setState({refresh: false});
   };
 
@@ -79,7 +139,7 @@ export default class ListChat extends Component {
         }>
         <FlatList
           keyExtractor={this.keyExtractor}
-          data={this.state.users}
+          data={this.state.data}
           renderItem={this.renderItem}
         />
       </ScrollView>
@@ -97,4 +157,29 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 'bold',
   },
+  background: {
+    paddingHorizontal: wp('4.17%'),
+    width: wp('88.89%'),
+    height: hp('6.11%'),
+    borderColor: '#BFBEBE',
+    borderWidth: 1,
+    borderRadius: 5,
+    marginHorizontal: 15,
+    flexDirection: 'row',
+    alignItems: 'center',
+
+    alignSelf: 'center',
+},
+TextInputName: {
+  marginLeft: wp('5.56%'),
+  fontFamily: 'Montserrat_SemiBold',
+  fontSize: hp('3%'),
+  marginBottom: hp('1.81%'),
+},
+descriptionText: {
+  marginLeft: wp('5.56%'),
+  fontFamily: 'Montserrat_SemiBold',
+  fontSize: hp('2%'),
+  marginBottom: hp('1.81%'),
+},
 });

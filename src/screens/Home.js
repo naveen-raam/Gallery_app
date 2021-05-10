@@ -6,6 +6,7 @@ import {
   ImageBackground,
   TouchableOpacity,
   Image,
+  
 } from 'react-native';
 import {
   Container,

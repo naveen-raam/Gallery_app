@@ -1,7 +1,8 @@
+/* eslint-disable comma-dangle */
 /* eslint-disable prettier/prettier */
 import React, {Component} from 'react';
 
-import {StyleSheet, View,  Image, BackHandler, Keyboard, TouchableOpacity, TextInput } from 'react-native';
+import {StyleSheet, View, TouchableOpacity, TextInput, AsyncStorage  } from 'react-native';
 import { Text, Icon } from 'native-base';
 import {
   widthPercentageToDP as wp,
@@ -28,6 +29,7 @@ export default class addNote extends Component {
 
   componentDidMount = () => {
     this.setState({loading: false});
+    
   };
 
   handleTitleChange = (text) => {
@@ -37,12 +39,14 @@ handleDescChange = (text) => {
   this.setState({ desc: text.trim() })
 }
 
-selectFile = () => {
+selectFile =async() => {
   ImagePicker.openPicker({
     multiple: true
   }).then(images => {
     // console.log(images);
     this.setState({image: images, imageCount: images.length})
+    
+    
 
   });
 }
@@ -100,9 +104,66 @@ selectFile = () => {
                             style={[styles.button, { marginTop: hp('3.47%') }]}
                             onPress={() => {
                                 console.log("Add pressed");
-                                //this.props.navigation.navigate('SignupEmail');
+                                let x = new Date().valueOf().toString();
+                                
+                                
+                               
+                                // You only need to define what will be added or updated
+                                let UID123_delta = {
+                                  key: x,
+                                  traits: this.state.image,
+                                };
 
-                                Actions.pop()
+                                let temp = {
+                                  key:x,
+                                  item: this.state.image,
+                                  title: this.state.title,
+                                  desc: this.state.desc,
+                                };
+
+                                AsyncStorage.setItem(
+                                  x,
+                                  JSON.stringify(temp),
+                                  () => {
+                                    AsyncStorage.getAllKeys((err,keys) => {
+                                      console.log(keys)
+                                      AsyncStorage.multiGet(keys, (err,stores) => {
+                                        stores.map((result,i,store) => {
+                                          let key = store[i][0];
+                                          let value = store[i][1];
+                                          console.log(key,value)
+                                        })
+                                        Actions.pop()
+                                      })
+                                    })
+                                  }
+                                )
+                                
+                                // AsyncStorage.getItem('UID123', (err, result) => {
+                                //   console.log(result);
+                                //   let r = result
+                                //   r.append(this.state.image)
+                                //   if(this.state.image){ 
+                                //   this.setState({image: r
+                                  
+                                
+                                //   },() => {
+                                //     AsyncStorage.mergeItem(
+                                //       'UID123',
+                                //       JSON.stringify(this.state.image),
+                                //       () => {
+                                //         AsyncStorage.getItem('UID123', (err, result) => {
+                                //           console.log("final result",result);
+                                //         });
+                                //       }
+                                //     );
+                                  
+                                //   })
+                                // }
+                                // });
+                                    
+                                  
+                                //Actions.pop()
                             }}
                         >
                             <View style={[styles.horizontalContainer]}>
