@@ -4,8 +4,7 @@ import {
   StyleSheet,
   Platform,
   ImageBackground,
-  TouchableOpacity,
-  Image,
+  
   
 } from 'react-native';
 import {
@@ -58,24 +57,14 @@ const Home = () => {
           <Title style={styles.headerText}>Quixote</Title>
         </Body>
         <Right>
-          <Button transparent>
-            <Icon name="search" style={styles.icon} />
-          </Button>
+          
           <Button transparent>
             <Menu>
               <MenuTrigger>
                 <Icon name="menu" style={styles.icon} />
               </MenuTrigger>
               <MenuOptions>
-                <MenuOption
-                  onSelect={() => alert('setting')}
-                  style={{flexDirection: 'row'}}>
-                  <Icon
-                    name="ios-settings"
-                    style={{color: '#BC2C3D', fontSize: 24}}
-                  />
-                  <Text style={styles.menuText}>Setting</Text>
-                </MenuOption>
+                
                 <MenuOption onSelect={logout} style={{flexDirection: 'row'}}>
                   <Icon
                     name="md-log-out"

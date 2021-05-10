@@ -31,50 +31,10 @@ class Auth extends Component {
   }
 
   componentDidMount() {
-    this.state.type === 'Sign Up' && this.getLocation();
+    // this.state.type === 'Sign Up' && this.getLocation();
   }
 
-  LocationPermission = async () => {
-    const granted = PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-      {
-        title: `Let's Chat Location Permission`,
-        message: `Let's Chat App needs access to your location`,
-      },
-    );
-    if (granted) {
-      return true;
-    }
-    return false;
-  };
-
-  getLocation = async () => {
-    const hasLocationPermission = await this.LocationPermission();
-    if (!hasLocationPermission) {
-      return;
-    }
-
-    this.setState(() => {
-      Geolocation.getCurrentPosition(
-        position => {
-          this.setState({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          });
-        },
-        error => {
-          this.setState({errorMessage: error});
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 8000,
-          maximumAge: 8000,
-          distanceFilter: 50,
-          forceRequestLocation: true,
-        },
-      );
-    });
-  };
+ 
 
   onRegister = async values => {
     this.setState({isLoading: true});
@@ -88,9 +48,7 @@ class Auth extends Component {
           color: '#29B6F6',
           isLoading: false,
         });
-        const latitude = this.state.latitude || '';
-        const longitude = this.state.longitude || null;
-        firebase.shared.addUserData(values, latitude, longitude);
+        
       })
       .catch(err => {
         console.log(err);

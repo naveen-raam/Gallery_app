@@ -7,7 +7,7 @@ import {
   heightPercentageToDP as hp
 } from 'react-native-responsive-screen';
 
-import {Actions} from 'react-native-router-flux';
+
 
 
 export default class Chat extends Component {

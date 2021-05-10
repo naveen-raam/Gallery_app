@@ -15,7 +15,7 @@ const Routes = () => {
         <Scene key="signup" component={Signup} title="Register" />
         <Scene key="home" component={Home} title="Home" />
         <Scene key="chat" component={Chat} title="Chat" />
-        <Scene key="friend" component={Friend} title="Friend" />
+        {/* <Scene key="friend" component={Friend} title="Friend" /> */}
         <Scene key="maps" component={Maps} title="Maps" />
       </Stack>
     </Router>

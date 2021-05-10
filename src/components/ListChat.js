@@ -13,7 +13,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp
 } from 'react-native-responsive-screen';
-import {ListItem} from 'react-native-elements';
+
 import {Actions} from 'react-native-router-flux';
 import firebase from '../config/Fire';
 import {Bubbles} from 'react-native-loader';
